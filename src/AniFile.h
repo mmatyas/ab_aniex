@@ -3,10 +3,13 @@
 
 #include "AniFrame.h"
 #include "AniSequence.h"
-#include "BinaryFile.h"
 
 #include <list>
+#include <stdint.h>
 #include <string>
+
+struct Bitmap;
+struct BinaryFile;
 
 struct FileItem {
     // from file
@@ -40,11 +43,12 @@ public:
     virtual ~AniFile();
 
 private:
+    std::string file_path;
     std::list<AniFrame> frames;
     std::list<AniSequence> sequences;
 
     void parse_frame(BinaryFile&, const FileItem&);
-    void parse_cimg(BinaryFile&, const FileItem&);
+    void parse_cimg(BinaryFile&, const FileItem&, Bitmap*&);
 };
 
 #endif // ANIFILE_H

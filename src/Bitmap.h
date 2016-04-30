@@ -15,10 +15,10 @@ struct Bitmap {
     uint16_t height;
     size_t bytes_per_line;
     size_t padding_per_line;
-    size_t palette_size;
-    size_t data_size;
     size_t palette_location;
     size_t data_location;
+    size_t palette_size;
+    size_t data_size;
     uint8_t* data;
 
     Bitmap(uint16_t img_w, uint16_t img_h, uint16_t img_bpp);

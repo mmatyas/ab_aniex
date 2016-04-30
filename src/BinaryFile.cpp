@@ -9,6 +9,12 @@ BinaryFile::BinaryFile(const char* filename, const char* options)
     fp = fopen(filename, options);
 }
 
+BinaryFile::BinaryFile(const std::string& filename, const char* options)
+    : fp(NULL)
+{
+    fp = fopen(filename.c_str(), options);
+}
+
 BinaryFile::~BinaryFile()
 {
     if (fp)

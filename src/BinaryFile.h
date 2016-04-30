@@ -1,12 +1,14 @@
 #ifndef FILEIO_H
 #define FILEIO_H
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <string>
 
 class BinaryFile {
 public:
     BinaryFile(const char* filename, const char* options);
+    BinaryFile(const std::string& filename, const char* options);
     ~BinaryFile();
 
     bool is_open();

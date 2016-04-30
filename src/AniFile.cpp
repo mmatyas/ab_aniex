@@ -1,5 +1,6 @@
 #include "AniFile.h"
 
+#include "BinaryFile.h"
 #include "Bitmap.h"
 
 #include <stdio.h>
@@ -20,6 +21,7 @@ void FileItem::read(BinaryFile& in)
 }
 
 AniFile::AniFile(const std::string& file_path)
+    : file_path(file_path)
 {
     BinaryFile in(file_path.c_str(), "r");
     if (!in.is_open())
@@ -63,6 +65,7 @@ void AniFile::parse_frame(BinaryFile& in, const FileItem& ani_item)
     bool has_data = false;
 
     std::string name("");
+    Bitmap* bmp_ptr = NULL;
 
     while (in.current_pos() < ani_item.end_pos) {
         FileItem item;
@@ -75,14 +78,14 @@ void AniFile::parse_frame(BinaryFile& in, const FileItem& ani_item)
 
             char name_bytes[item.length];
             in.read_raw(name_bytes, item.length);
-            name = std::string(name_bytes, item.length);
+            name = std::string(name_bytes, item.length - 1);
             printf("debug: %s\n", name.c_str());
 
             has_name = true;
         }
         else if (item.signature == "CIMG") {
             printf("  CIMG\n");
-            parse_cimg(in, item);
+            parse_cimg(in, item, bmp_ptr);
             has_data = true;
         }
         else {
@@ -95,11 +98,15 @@ void AniFile::parse_frame(BinaryFile& in, const FileItem& ani_item)
     if (!has_data)
         printf("warning: frame %zu has no data\n", frames.size() + 1);
 
-    //if (has_name && has_data)
-    //    frames.push_back()
+    if (has_name && has_data && bmp_ptr) {
+        BinaryFile out("./" + name + ".bmp", "w");
+        out.write_raw(bmp_ptr->data, bmp_ptr->data_size);
+    }
+
+    delete bmp_ptr;
 }
 
-void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item)
+void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item, Bitmap*& bmp_ptr)
 {
     if (frame_item.length < 32)
         throw std::runtime_error("CIMG is too small!");
@@ -168,7 +175,7 @@ void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item)
     //
     // create BMP
     //
-    Bitmap bmp(img.width, img.height, img.bpp);
+    bmp_ptr = new Bitmap(img.width, img.height, img.bpp);
 
     //
     // palette data (vary)
@@ -181,11 +188,11 @@ void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item)
 
         if (img.bpp < 16) {
             in.skip_bytes(Bitmap::BMP_HEADER_SIZE);
-            in.read_raw(bmp.data + bmp.palette_location, bmp.palette_size);
+            in.read_raw(bmp_ptr->data + bmp_ptr->palette_location, bmp_ptr->palette_size);
         }
 
-        if (palette_size > bmp.palette_size)
-            in.skip_bytes(palette_size - bmp.palette_size);
+        if (palette_size > bmp_ptr->palette_size)
+            in.skip_bytes(palette_size - bmp_ptr->palette_size);
 
         long palette_end_pos = in.current_pos();
         printf("  palette found, %ld bytes\n", palette_end_pos - palette_begin_pos);
@@ -208,5 +215,16 @@ void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item)
     //
     // decode data
     //
-    bmp.decode_cimg_data(in, frame_item.end_pos - in.current_pos());
+    bmp_ptr->decode_cimg_data(in, frame_item.end_pos - in.current_pos());
+    if (in.current_pos() + 1 > frame_item.end_pos) {
+        // no terminator
+    }
+    else if (in.current_pos() + 1 < frame_item.end_pos) {
+        in.read_u8();
+        in.skip_bytes(frame_item.end_pos - in.current_pos() - 1);
+    }
+    else {
+        if (in.read_u8() != 0xFF)
+            in.read_u8();
+    }
 }
