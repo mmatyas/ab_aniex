@@ -39,6 +39,12 @@ void BinaryFile::rewind()
         ::rewind(fp);
 }
 
+void BinaryFile::skip_bytes(size_t amount)
+{
+    if (0 != fseek(fp, amount, SEEK_CUR))
+        throw std::runtime_error("File seek error");
+}
+
 void BinaryFile::write_i8(int8_t value)
 {
     fwrite_or_exception(&value, sizeof(int8_t), 1);
@@ -133,6 +139,21 @@ int16_t BinaryFile::read_i16()
     return in;
 }
 
+uint16_t BinaryFile::read_u16()
+{
+    uint16_t in;
+    fread_or_exception(&in, sizeof(uint16_t), 1);
+
+#ifdef BYTEORDER_BIG_ENDIAN
+    uint32_t tmp = in;
+
+    ((char*)&in)[0] = ((char*)&tmp)[1];
+    ((char*)&in)[1] = ((char*)&tmp)[0];
+#endif
+
+    return in;
+}
+
 void BinaryFile::read_i16_array(int16_t* target, size_t size)
 {
     assert(target);
@@ -159,6 +180,23 @@ int32_t BinaryFile::read_i32()
 
 #ifdef BYTEORDER_BIG_ENDIAN
     int32_t tmp = in;
+
+    ((char*)&in)[0] = ((char*)&tmp)[3];
+    ((char*)&in)[1] = ((char*)&tmp)[2];
+    ((char*)&in)[2] = ((char*)&tmp)[1];
+    ((char*)&in)[3] = ((char*)&tmp)[0];
+#endif
+
+    return in;
+}
+
+uint32_t BinaryFile::read_u32()
+{
+    uint32_t in;
+    fread_or_exception(&in, sizeof(uint32_t), 1);
+
+#ifdef BYTEORDER_BIG_ENDIAN
+    uint32_t tmp = in;
 
     ((char*)&in)[0] = ((char*)&tmp)[3];
     ((char*)&in)[1] = ((char*)&tmp)[2];

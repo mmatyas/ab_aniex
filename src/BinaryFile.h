@@ -12,6 +12,8 @@ public:
     bool is_open();
     void rewind();
 
+    void skip_bytes(size_t);
+
     void write_i8(int8_t);
     void write_u8(uint8_t);
     void write_i16(int16_t);
@@ -23,7 +25,9 @@ public:
     int8_t read_i8();
     uint8_t read_u8();
     int16_t read_i16();
+    uint16_t read_u16();
     int32_t read_i32();
+    uint32_t read_u32();
     bool read_bool();
     float read_float();
     void read_i16_array(int16_t*, size_t);

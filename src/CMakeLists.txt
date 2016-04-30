@@ -1,5 +1,6 @@
 set(SRC
 	main.cpp
+	AniFile.cpp
 	BinaryFile.cpp
 )
 
