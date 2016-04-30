@@ -1,12 +1,12 @@
 #include "AniFile.h"
 
+#include "Bitmap.h"
+
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
 
 #include <stdexcept>
-
-const size_t BMP_HEADER_SIZE = 54;
 
 void FileItem::read(BinaryFile& in)
 {
@@ -34,10 +34,6 @@ AniFile::AniFile(const std::string& file_path)
 
     uint32_t file_length = in.read_u32();
     in.read_u16(); // file id
-
-    // item counts
-    unsigned PAL_count = 0;
-    unsigned TPAL_count = 0;
 
     // read items
     long file_end = in.current_pos() + file_length;
@@ -170,6 +166,11 @@ void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item)
     printf("  %d x %d @ %d\n", img.width, img.height, img.bpp);
 
     //
+    // create BMP
+    //
+    Bitmap bmp(img.width, img.height, img.bpp);
+
+    //
     // palette data (vary)
     //
     if (has_palette_header) {
@@ -178,18 +179,13 @@ void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item)
         in.read_u32(); // unknown
         in.read_u32(); // unknown
 
-        size_t bmp_palette_size;
         if (img.bpp < 16) {
-            bmp_palette_size = 4 * (1 << img.bpp);
-            in.skip_bytes(BMP_HEADER_SIZE);
-            in.skip_bytes(bmp_palette_size); // TODO: save palette
-        }
-        else {
-            bmp_palette_size = 0;
+            in.skip_bytes(Bitmap::BMP_HEADER_SIZE);
+            in.read_raw(bmp.data + bmp.palette_location, bmp.palette_size);
         }
 
-        if (palette_size > bmp_palette_size)
-            in.skip_bytes(palette_size - bmp_palette_size);
+        if (palette_size > bmp.palette_size)
+            in.skip_bytes(palette_size - bmp.palette_size);
 
         long palette_end_pos = in.current_pos();
         printf("  palette found, %ld bytes\n", palette_end_pos - palette_begin_pos);
@@ -212,4 +208,5 @@ void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item)
     //
     // decode data
     //
+    bmp.decode_cimg_data(in, frame_item.end_pos - in.current_pos());
 }
