@@ -16,10 +16,22 @@ struct FileItem {
 
     // calculated
     std::string signature;
-    uint32_t start_pos;
-    uint32_t end_pos;
+    long start_pos;
+    long end_pos;
 
-    void read(BinaryFile&, uint32_t&);
+    void read(BinaryFile&);
+};
+
+struct CImg {
+    uint16_t type;
+    uint16_t width;
+    uint16_t height;
+    uint16_t hotspot_x;
+    uint16_t hotspot_y;
+    uint16_t keycolor_bytes;
+    uint16_t bpp;
+    size_t compressed_size;
+    size_t uncompressed_size;
 };
 
 class AniFile {
@@ -31,7 +43,8 @@ private:
     std::list<AniFrame> frames;
     std::list<AniSequence> sequences;
 
-    void parse_frame(BinaryFile&, uint32_t&, const FileItem&);
+    void parse_frame(BinaryFile&, const FileItem&);
+    void parse_cimg(BinaryFile&, const FileItem&);
 };
 
 #endif // ANIFILE_H

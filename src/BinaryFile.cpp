@@ -1,6 +1,5 @@
 #include "BinaryFile.h"
 
-#include <cassert>
 #include <cstring>
 #include <stdexcept>
 
@@ -37,6 +36,14 @@ void BinaryFile::rewind()
 {
     if (fp)
         ::rewind(fp);
+}
+
+long BinaryFile::current_pos() const
+{
+    if (fp)
+        return ftell(fp);
+
+    return -1;
 }
 
 void BinaryFile::skip_bytes(size_t amount)
@@ -154,25 +161,6 @@ uint16_t BinaryFile::read_u16()
     return in;
 }
 
-void BinaryFile::read_i16_array(int16_t* target, size_t size)
-{
-    assert(target);
-    assert(size > 0);
-
-#ifdef BYTEORDER_BIG_ENDIAN
-    for (unsigned int i = 0; i < size; i++) {
-        fread_or_exception(&target[i], sizeof(int16_t), 1);
-
-        int tmp = target[i];
-
-        ((char*)&target[i])[0] = ((char*)&tmp)[1];
-        ((char*)&target[i])[1] = ((char*)&tmp)[0];
-    }
-#else
-    fread_or_exception(target, sizeof(int16_t), size);
-#endif
-}
-
 int32_t BinaryFile::read_i32()
 {
     int32_t in;
@@ -205,27 +193,6 @@ uint32_t BinaryFile::read_u32()
 #endif
 
     return in;
-}
-
-void BinaryFile::read_i32_array(int32_t* target, size_t size)
-{
-    assert(target);
-    assert(size > 0);
-
-#ifdef BYTEORDER_BIG_ENDIAN
-    for (unsigned int i = 0; i < size; i++) {
-        fread_or_exception(&target[i], sizeof(int32_t), 1);
-
-        int tmp = target[i];
-
-        ((char*)&target[i])[0] = ((char*)&tmp)[3];
-        ((char*)&target[i])[1] = ((char*)&tmp)[2];
-        ((char*)&target[i])[2] = ((char*)&tmp)[1];
-        ((char*)&target[i])[3] = ((char*)&tmp)[0];
-    }
-#else
-    fread_or_exception(target, sizeof(int32_t), size);
-#endif
 }
 
 float BinaryFile::read_float()

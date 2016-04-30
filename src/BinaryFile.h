@@ -11,6 +11,7 @@ public:
 
     bool is_open();
     void rewind();
+    long current_pos() const;
 
     void skip_bytes(size_t);
 
@@ -30,8 +31,6 @@ public:
     uint32_t read_u32();
     bool read_bool();
     float read_float();
-    void read_i16_array(int16_t*, size_t);
-    void read_i32_array(int32_t*, size_t);
     void read_raw(void*, size_t);
 
 private:
