@@ -1,9 +1,6 @@
 #ifndef ANIFILE_H
 #define ANIFILE_H
 
-//#include "AniFrame.h"
-//#include "AniSequence.h"
-
 #include <list>
 #include <stdint.h>
 #include <string>
@@ -32,8 +29,6 @@ public:
 
 private:
     std::string file_path;
-    //std::list<AniFrame> frames;
-    //std::list<AniSequence> sequences;
 
     void parse_frame(BinaryFile&, const FileItem&);
     void parse_cimg(BinaryFile&, const FileItem&, Bitmap*&);

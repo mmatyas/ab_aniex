@@ -65,27 +65,11 @@ void BinaryFile::write_u8(uint8_t value)
 
 void BinaryFile::write_u16(int16_t value)
 {
-#ifdef BYTEORDER_BIG_ENDIAN
-    uint32_t tmp = value;
-
-    ((char*)&out)[0] = ((char*)&tmp)[1];
-    ((char*)&out)[1] = ((char*)&tmp)[0];
-#endif
-
     fwrite_or_exception(&value, sizeof(uint16_t), 1);
 }
 
 void BinaryFile::write_u32(int32_t value)
 {
-#ifdef BYTEORDER_BIG_ENDIAN
-    uint32_t tmp = value;
-
-    ((char*)&out)[0] = ((char*)&tmp)[3];
-    ((char*)&out)[1] = ((char*)&tmp)[2];
-    ((char*)&out)[2] = ((char*)&tmp)[1];
-    ((char*)&out)[3] = ((char*)&tmp)[0];
-#endif
-
     fwrite_or_exception(&value, sizeof(uint32_t), 1);
 }
 
@@ -105,14 +89,6 @@ uint16_t BinaryFile::read_u16()
 {
     uint16_t in;
     fread_or_exception(&in, sizeof(uint16_t), 1);
-
-#ifdef BYTEORDER_BIG_ENDIAN
-    uint32_t tmp = in;
-
-    ((char*)&in)[0] = ((char*)&tmp)[1];
-    ((char*)&in)[1] = ((char*)&tmp)[0];
-#endif
-
     return in;
 }
 
@@ -120,16 +96,6 @@ uint32_t BinaryFile::read_u32()
 {
     uint32_t in;
     fread_or_exception(&in, sizeof(uint32_t), 1);
-
-#ifdef BYTEORDER_BIG_ENDIAN
-    uint32_t tmp = in;
-
-    ((char*)&in)[0] = ((char*)&tmp)[3];
-    ((char*)&in)[1] = ((char*)&tmp)[2];
-    ((char*)&in)[2] = ((char*)&tmp)[1];
-    ((char*)&in)[3] = ((char*)&tmp)[0];
-#endif
-
     return in;
 }
 
