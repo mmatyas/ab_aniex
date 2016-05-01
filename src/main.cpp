@@ -2,11 +2,17 @@
 
 #include <stdexcept>
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, char const *argv[])
 {
+    if (argc < 2) {
+        printf("Usage: %s ANIFILE\n", argv[0]);
+        return 1;
+    }
+
     try {
-        AniFile ani("STAND.ANI");
+        AniFile ani(argv[1]);
     }
     catch (const std::exception& error)
     {

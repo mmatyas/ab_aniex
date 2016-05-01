@@ -6,6 +6,7 @@
 #include <stddef.h>
 
 #include "BinaryFile.h"
+#include "CIMGInfo.h"
 
 struct Bitmap {
     static const size_t BMP_HEADER_SIZE = 54;
@@ -13,18 +14,17 @@ struct Bitmap {
     uint16_t bpp;
     uint16_t width;
     uint16_t height;
-    size_t bytes_per_line;
-    size_t padding_per_line;
-    size_t palette_location;
-    size_t data_location;
-    size_t palette_size;
-    size_t data_size;
-    uint8_t* data;
 
-    Bitmap(uint16_t img_w, uint16_t img_h, uint16_t img_bpp);
+    uint8_t* palette_data;
+    size_t palette_size;
+
+    uint8_t* data;
+    size_t data_size;
+
+    Bitmap(const CImg&);
     virtual ~Bitmap();
 
-    void decode_cimg_data(BinaryFile& in, const size_t max_length);
+    void write_file(const std::string filename);
 };
 
 #endif // BITMAP_H

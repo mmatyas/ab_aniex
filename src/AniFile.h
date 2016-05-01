@@ -1,8 +1,8 @@
 #ifndef ANIFILE_H
 #define ANIFILE_H
 
-#include "AniFrame.h"
-#include "AniSequence.h"
+//#include "AniFrame.h"
+//#include "AniSequence.h"
 
 #include <list>
 #include <stdint.h>
@@ -25,18 +25,6 @@ struct FileItem {
     void read(BinaryFile&);
 };
 
-struct CImg {
-    uint16_t type;
-    uint16_t width;
-    uint16_t height;
-    uint16_t hotspot_x;
-    uint16_t hotspot_y;
-    uint16_t keycolor_bytes;
-    uint16_t bpp;
-    size_t compressed_size;
-    size_t uncompressed_size;
-};
-
 class AniFile {
 public:
     AniFile(const std::string& file_path);
@@ -44,8 +32,8 @@ public:
 
 private:
     std::string file_path;
-    std::list<AniFrame> frames;
-    std::list<AniSequence> sequences;
+    //std::list<AniFrame> frames;
+    //std::list<AniSequence> sequences;
 
     void parse_frame(BinaryFile&, const FileItem&);
     void parse_cimg(BinaryFile&, const FileItem&, Bitmap*&);
