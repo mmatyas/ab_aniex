@@ -118,8 +118,6 @@ void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item, Bitmap*& tg
     in.read_u16(); // unknown
     uint32_t additional_size = in.read_u32();
     //printf("  type: 0x%x, special header: %d bytes\n", img.type, additional_size);
-    if (img.type != 0x04)
-        printf("warning: image is not in the default format, export may fail\n");
 
     if (additional_size < 24)
         throw std::runtime_error("CIMG special header is too small!");
@@ -171,7 +169,9 @@ void AniFile::parse_cimg(BinaryFile& in, const FileItem& frame_item, Bitmap*& tg
             throw std::runtime_error("CIMG has unknown image type!");
     }
 
-    //printf("  %d x %d @ %d\n", img.width, img.height, img.bpp);
+    printf("info: found an image: %d x %d @ %dbpp\n", img.width, img.height, img.bpp);
+    if (img.type != 0x04)
+        printf("warning: image is not in the default format, export may fail\n");
 
     //
     // palette data (vary)
